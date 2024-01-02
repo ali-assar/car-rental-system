@@ -1,20 +1,26 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"flag"
+
+	"github.com/Ali-Assar/reservation-system/api"
+	"github.com/gofiber/fiber/v2"
+)
 
 func main() {
-	app := fiber.New()
-	apiv1 := app.Group("/api/v1")
+	listenAddr := flag.String("listenAddr", ":5000", "this is the default address API server") // you can change the port by this command  ./bin/api --listenAddr :7000
+	flag.Parse()
 
-	apiv1.Get("/user", handleUser)
+	app := fiber.New()
+	apiV1 := app.Group("/api/v1")
+
+	apiV1.Get("/user", api.HandleGetUsers)
+	apiV1.Get("/user", api.HandleGetUser)
 	app.Get("/poo", handlePoo)
 
-	app.Listen(":5000")
+	app.Listen(*listenAddr)
 }
 
 func handlePoo(c *fiber.Ctx) error {
 	return c.JSON(map[string]string{"message": "working just fine"})
-}
-func handleUser(c *fiber.Ctx) error {
-	return c.JSON(map[string]string{"user": "ali"})
 }
