@@ -1,4 +1,4 @@
-module github.com/Ali-Assar/reservation-system
+module github.com/Ali-Assar/car-rental-system
 
 go 1.21.5
 

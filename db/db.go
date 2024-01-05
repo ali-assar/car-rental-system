@@ -1,3 +1,3 @@
 package db
 
-const DBNAME = "reservation-system"
+const DBNAME = "car-rental-system"
