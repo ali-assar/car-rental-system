@@ -16,12 +16,15 @@ type CarStore interface {
 type MongoCarStore struct {
 	client *mongo.Client
 	coll   *mongo.Collection
+
+	AgencyStore
 }
 
-func NewMongoCarStore(client *mongo.Client, dbname string) *MongoCarStore {
+func NewMongoCarStore(client *mongo.Client, agencyStore AgencyStore) *MongoCarStore {
 	return &MongoCarStore{
-		client: client,
-		coll:   client.Database(dbname).Collection("cars"),
+		client:      client,
+		coll:        client.Database(DBNAME).Collection("cars"),
+		AgencyStore: agencyStore,
 	}
 }
 
@@ -35,5 +38,8 @@ func (s *MongoCarStore) InsertCar(ctx context.Context, car *types.Car) (*types.C
 	//update the hotel with this room id
 	filter := bson.M{"_id": car.AgencyID}
 	update := bson.M{"$push": bson.M{"cars": car.ID}}
+	if err := s.AgencyStore.UpdateAgency(ctx, filter, update); err != nil {
+		return nil, err
+	}
 	return car, nil
 }

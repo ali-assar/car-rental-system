@@ -2,30 +2,30 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/Ali-Assar/car-rental-system/db"
 	"github.com/Ali-Assar/car-rental-system/types"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func main() {
-	ctx := context.Background()
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
-	if err != nil {
-		log.Fatal(err)
-	}
+var (
+	client      *mongo.Client
+	carStore    db.CarStore
+	agencyStore db.AgencyStore
+	ctx         = context.Background()
+)
 
-	agencyStore := db.NewMongoAgencyStore(client, db.DBNAME)
-	carStore := db.NewMongoCarStore(client, db.DBNAME)
-
+func seedAgency(name, location string, rating int) {
 	agency := types.Agency{
-		Name:     "DrivingPartner",
-		Location: "Rome",
+		Name:     name,
+		Location: location,
+		Cars:     []primitive.ObjectID{},
+		Rating:   rating,
 	}
-
 	cars := []types.Car{
 		{Type: types.EconomyCarsType,
 			BasePrice: 20,
@@ -37,18 +37,36 @@ func main() {
 			BasePrice: 50,
 		},
 	}
-
 	insertedAgency, err := agencyStore.InsertAgency(ctx, &agency)
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, car := range cars {
 		car.AgencyID = insertedAgency.ID
-		insertedCar, err := carStore.InsertCar(ctx, &car)
+		_, err := carStore.InsertCar(ctx, &car)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(insertedCar)
+	}
+}
+
+func main() {
+	seedAgency("Driving Partner", "Rome", 3)
+	seedAgency("Car Bank", "Milan", 5)
+	seedAgency("Go voom voom", "Paris", 2)
+
+}
+
+func init() {
+	var err error
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := client.Database(db.DBNAME).Drop(ctx); err != nil {
+		log.Fatal(err)
 	}
 
+	agencyStore = db.NewMongoAgencyStore(client)
+	carStore = db.NewMongoCarStore(client, agencyStore)
 }

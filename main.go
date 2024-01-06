@@ -30,17 +30,25 @@ func main() {
 	}
 
 	//handlers initialization
-	userHandler := api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
+	var (
+		userHandler   = api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
+		agencyStore   = db.NewMongoAgencyStore(client)
+		carStore      = db.NewMongoCarStore(client, agencyStore)
+		agencyHandler = api.NewAgencyHandler(agencyStore, carStore)
 
-	app := fiber.New(config)
-	apiv1 := app.Group("/api/v1")
+		app   = fiber.New(config)
+		apiv1 = app.Group("/api/v1")
+	)
 
+	//user handlers
 	apiv1.Put("/user/:id", userHandler.HandlePutUser)
 	apiv1.Delete("/user/:id", userHandler.HandleDeleteUser)
 	apiv1.Post("/user/", userHandler.HandlePostUser)
 	apiv1.Get("/user", userHandler.HandleGetUsers)
 	apiv1.Get("/user/:id", userHandler.HandleGetUser)
 
-	app.Listen(":5000")
+	//agency handlers
+	apiv1.Get("/agency", agencyHandler.HandleGetAgencies)
+
 	app.Listen(*listenAddr)
 }

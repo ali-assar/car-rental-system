@@ -12,6 +12,7 @@ import (
 type AgencyStore interface {
 	InsertAgency(context.Context, *types.Agency) (*types.Agency, error)
 	UpdateAgency(context.Context, bson.M, bson.M) error
+	GetAgencies(context.Context, bson.M) ([]*types.Agency, error)
 }
 
 type MongoAgencyStore struct {
@@ -19,13 +20,24 @@ type MongoAgencyStore struct {
 	coll   *mongo.Collection
 }
 
-func NewMongoAgencyStore(client *mongo.Client, dbname string) *MongoAgencyStore {
+func NewMongoAgencyStore(client *mongo.Client) *MongoAgencyStore {
 	return &MongoAgencyStore{
 		client: client,
-		coll:   client.Database(dbname).Collection("agency"),
+		coll:   client.Database(DBNAME).Collection("agency"),
 	}
 }
 
+func (s *MongoAgencyStore) GetAgencies(ctx context.Context, filter bson.M) ([]*types.Agency, error) {
+	resp, err := s.coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	var agencies []*types.Agency
+	if err := resp.All(ctx, &agencies); err != nil {
+		return nil, err
+	}
+	return agencies, err
+}
 func (s *MongoAgencyStore) UpdateAgency(ctx context.Context, filter, update bson.M) error {
 	_, err := s.coll.UpdateOne(ctx, filter, update)
 	return err

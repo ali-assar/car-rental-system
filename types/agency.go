@@ -7,7 +7,7 @@ type Agency struct {
 	Name     string               `bson:"name" json:"name"`
 	Location string               `bson:"location" json:"location"`
 	Cars     []primitive.ObjectID `bson:"cars" json:"cars"`
-	//maybe adding ratings here
+	Rating   int                  `bson:"rating" json:"rating"`
 }
 
 type CarType int
