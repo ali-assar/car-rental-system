@@ -19,17 +19,18 @@ const (
 	SUVCarsType
 	SportCarsType
 	MinivanCarsType
-	HybridCarsType
-	ElectricCarsType
 	CargoVanType
 	LuxuryCarsType
 	FullSizeCarsType
+	MuscleCar
 )
 
 type Car struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	Type      CarType            `bson:"type" json:"type"`
-	BasePrice float64            `bson:"basePrice" json:"basePrice"`
-	Price     float64            `bson:"price" json:"price"`
-	AgencyID  primitive.ObjectID `bson:"agencyID" json:"agencyID"`
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Type     string             `bson:"type" json:"type"`
+	Fuel     string             `bson:"fuel" json:"fuel"` //petrol, hybrid,gas
+	Year     int                `bson:"year" json:"year"`
+	Model    string             `bson:"model" json:"model"`
+	Price    float64            `bson:"price" json:"price"`
+	AgencyID primitive.ObjectID `bson:"agencyID" json:"agencyID"`
 }

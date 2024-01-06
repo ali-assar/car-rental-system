@@ -31,13 +31,19 @@ func main() {
 
 	//handlers initialization
 	var (
-		userHandler   = api.NewUserHandler(db.NewMongoUserStore(client, db.DBNAME))
-		agencyStore   = db.NewMongoAgencyStore(client)
-		carStore      = db.NewMongoCarStore(client, agencyStore)
-		agencyHandler = api.NewAgencyHandler(agencyStore, carStore)
+		agencyStore = db.NewMongoAgencyStore(client)
+		carStore    = db.NewMongoCarStore(client, agencyStore)
+		userStore   = db.NewMongoUserStore(client)
+		store       = &db.Store{
+			Agency: agencyStore,
+			Car:    carStore,
+			User:   userStore,
+		}
 
-		app   = fiber.New(config)
-		apiv1 = app.Group("/api/v1")
+		userHandler   = api.NewUserHandler(userStore)
+		agencyHandler = api.NewAgencyHandler(store)
+		app           = fiber.New(config)
+		apiv1         = app.Group("/api/v1")
 	)
 
 	//user handlers
@@ -49,6 +55,8 @@ func main() {
 
 	//agency handlers
 	apiv1.Get("/agency", agencyHandler.HandleGetAgencies)
+	apiv1.Get("/agency/:id", agencyHandler.HandleGetAgency)
+	apiv1.Get("/agency/:id/cars", agencyHandler.HandleGetCars)
 
 	app.Listen(*listenAddr)
 }

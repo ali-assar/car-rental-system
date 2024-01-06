@@ -11,6 +11,7 @@ import (
 
 type CarStore interface {
 	InsertCar(context.Context, *types.Car) (*types.Car, error)
+	GetCars(context.Context, bson.M) ([]*types.Car, error)
 }
 
 type MongoCarStore struct {
@@ -26,6 +27,19 @@ func NewMongoCarStore(client *mongo.Client, agencyStore AgencyStore) *MongoCarSt
 		coll:        client.Database(DBNAME).Collection("cars"),
 		AgencyStore: agencyStore,
 	}
+}
+
+func (s *MongoCarStore) GetCars(ctx context.Context, filter bson.M) ([]*types.Car, error) {
+	resp, err := s.coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	var cars []*types.Car
+	if err := resp.All(ctx, &cars); err != nil {
+		return nil, err
+	}
+	return cars, nil
+
 }
 
 func (s *MongoCarStore) InsertCar(ctx context.Context, car *types.Car) (*types.Car, error) {
