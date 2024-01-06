@@ -16,8 +16,25 @@ var (
 	client      *mongo.Client
 	carStore    db.CarStore
 	agencyStore db.AgencyStore
+	userStore   db.UserStore
 	ctx         = context.Background()
 )
+
+func seedUser(fname, lname, email string) {
+	user, err := types.NewUserFromParams(types.CreateUserParams{
+		Email:     email,
+		FirstName: fname,
+		LastName:  lname,
+		Password:  "supersecure",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = userStore.InsertUser(context.TODO(), user)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func seedAgency(name, location string, rating int) {
 	agency := types.Agency{
@@ -63,6 +80,7 @@ func main() {
 	seedAgency("Driving Partner", "Rome", 3)
 	seedAgency("Car Bank", "Milan", 5)
 	seedAgency("Go voom voom", "Paris", 2)
+	seedUser("james", "foo", "james@foo.com")
 
 }
 
@@ -78,4 +96,5 @@ func init() {
 
 	agencyStore = db.NewMongoAgencyStore(client)
 	carStore = db.NewMongoCarStore(client, agencyStore)
+	userStore = db.NewMongoUserStore(client)
 }

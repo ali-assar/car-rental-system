@@ -8,6 +8,7 @@ import (
 
 	"github.com/Ali-Assar/car-rental-system/api"
 	"github.com/Ali-Assar/car-rental-system/db"
+	"github.com/Ali-Assar/car-rental-system/middleware"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -42,9 +43,14 @@ func main() {
 
 		userHandler   = api.NewUserHandler(userStore)
 		agencyHandler = api.NewAgencyHandler(store)
+		authHandler   = api.NewAuthHandler(userStore)
 		app           = fiber.New(config)
-		apiv1         = app.Group("/api/v1")
+		auth          = app.Group("/api")
+		apiv1         = app.Group("/api/v1", middleware.JWTAuthentication)
 	)
+
+	//auth
+	auth.Post("/auth", authHandler.HandleAuthenticate)
 
 	//user handlers
 	apiv1.Put("/user/:id", userHandler.HandlePutUser)
