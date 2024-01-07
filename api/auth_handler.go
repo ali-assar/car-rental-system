@@ -3,11 +3,14 @@ package api
 import (
 	"errors"
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/Ali-Assar/car-rental-system/db"
+	"github.com/Ali-Assar/car-rental-system/types"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler struct {
@@ -25,6 +28,11 @@ type AuthParams struct {
 	Password string `json:"password"`
 }
 
+type AuthResponse struct {
+	User  *types.User `json:"user"`
+	Token string      `json:"token"`
+}
+
 func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 	var params AuthParams
 
@@ -40,10 +48,30 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 		return fmt.Errorf("invalid credentials")
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(params.Password))
-	if err != nil {
+	if !types.IsPasswordValid(user.EncryptedPassword, params.Password) {
 		return fmt.Errorf("invalid credentials")
 	}
-	fmt.Println("authenticated", user)
-	return nil
+
+	resp := AuthResponse{
+		User:  user,
+		Token: createTokenFromUser(user),
+	}
+	return c.JSON(resp)
+}
+
+func createTokenFromUser(user *types.User) string {
+	expires := time.Now().Add(time.Hour * 4).Format(time.RFC3339)
+	claims := jwt.MapClaims{
+		"id":      user.ID,
+		"email":   user.Email,
+		"expires": expires,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secret := os.Getenv("JWT_SECRET")
+	tokenStr, err := token.SignedString([]byte(secret))
+	if err != nil {
+		fmt.Println("failed to sign in with secret:", err)
+	}
+	return tokenStr
 }
