@@ -19,7 +19,8 @@ import (
 )
 
 const testDbUri = "mongodb://localhost:27017"
-const dbname = "car-rental-system-test"
+
+//const dbname = "car-rental-system-test"
 
 type testdb struct {
 	db.UserStore
@@ -59,12 +60,12 @@ func createUserAndPost(t *testing.T, app *fiber.App, userHandler *UserHandler, p
 }
 
 func TestPostUser(t *testing.T) {
-	tdb := setup(t)
+	tdb := setup(t) //
 	defer tdb.tearDown(t)
 
 	app := fiber.New()
 	userHandler := NewUserHandler(tdb.UserStore)
-	app.Post("/", userHandler.HandlePostUser)
+	app.Post("/", userHandler.HandlePostUser) //
 
 	params := types.CreateUserParams{
 		Email:     "chifo@kongfo.com",

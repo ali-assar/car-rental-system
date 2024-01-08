@@ -26,7 +26,7 @@ func JWTAuthentication(c *fiber.Ctx) error {
 	}
 	expires, err := time.Parse(time.RFC3339, expiresStr)
 	if err != nil {
-		return fmt.Errorf("invalid credentials", err)
+		return fmt.Errorf("invalid credentials %s", err)
 	}
 
 	if time.Now().After(expires) {
