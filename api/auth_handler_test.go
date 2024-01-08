@@ -96,4 +96,5 @@ func TestAuthenticateWithWrongPassword(t *testing.T) {
 	if resp.StatusCode != 400 { //400 = badRequest
 		t.Fatalf("expected status of 400 but got %d ", resp.StatusCode)
 	}
+
 }

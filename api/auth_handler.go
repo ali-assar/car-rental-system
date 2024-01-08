@@ -58,7 +58,7 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return invalidCredentials(c)
 		} /// check this later
-		return fmt.Errorf("invalid credentials")
+		return invalidCredentials(c)
 	}
 
 	if !types.IsPasswordValid(user.EncryptedPassword, params.Password) {

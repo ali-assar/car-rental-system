@@ -44,9 +44,10 @@ func main() {
 		userHandler   = api.NewUserHandler(userStore)
 		agencyHandler = api.NewAgencyHandler(store)
 		authHandler   = api.NewAuthHandler(userStore)
+		carHandler    = api.NewCarHandler(store)
 		app           = fiber.New(config)
 		auth          = app.Group("/api")
-		apiv1         = app.Group("/api/v1", middleware.JWTAuthentication)
+		apiv1         = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
 	)
 
 	//auth
@@ -63,6 +64,8 @@ func main() {
 	apiv1.Get("/agency", agencyHandler.HandleGetAgencies)
 	apiv1.Get("/agency/:id", agencyHandler.HandleGetAgency)
 	apiv1.Get("/agency/:id/cars", agencyHandler.HandleGetCars)
+
+	apiv1.Post("car/:id/reservation", carHandler.HandleReserveCar)
 
 	app.Listen(*listenAddr)
 }
