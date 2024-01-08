@@ -32,13 +32,15 @@ func main() {
 
 	//handlers initialization
 	var (
-		agencyStore = db.NewMongoAgencyStore(client)
-		carStore    = db.NewMongoCarStore(client, agencyStore)
-		userStore   = db.NewMongoUserStore(client)
-		store       = &db.Store{
-			Agency: agencyStore,
-			Car:    carStore,
-			User:   userStore,
+		agencyStore      = db.NewMongoAgencyStore(client)
+		carStore         = db.NewMongoCarStore(client, agencyStore)
+		userStore        = db.NewMongoUserStore(client)
+		reservationStore = db.NewMongoReservationStore(client)
+		store            = &db.Store{
+			Agency:      agencyStore,
+			Car:         carStore,
+			User:        userStore,
+			Reservation: reservationStore,
 		}
 
 		userHandler   = api.NewUserHandler(userStore)
@@ -64,7 +66,7 @@ func main() {
 	apiv1.Get("/agency", agencyHandler.HandleGetAgencies)
 	apiv1.Get("/agency/:id", agencyHandler.HandleGetAgency)
 	apiv1.Get("/agency/:id/cars", agencyHandler.HandleGetCars)
-
+	apiv1.Get("/car", carHandler.HandleGetCars)
 	apiv1.Post("car/:id/reservation", carHandler.HandleReserveCar)
 
 	app.Listen(*listenAddr)

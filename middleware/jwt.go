@@ -53,7 +53,6 @@ func validateToken(tokenStr string) (jwt.MapClaims, error) {
 		}
 
 		secret := os.Getenv("JWT_SECRET")
-		fmt.Println("never show secret", secret)
 		return []byte(secret), nil
 	})
 

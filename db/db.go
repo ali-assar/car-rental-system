@@ -7,7 +7,8 @@ const (
 )
 
 type Store struct {
-	User   UserStore
-	Agency AgencyStore
-	Car    CarStore
+	User        UserStore
+	Agency      AgencyStore
+	Car         CarStore
+	Reservation ReservationStore
 }
