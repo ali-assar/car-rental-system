@@ -7,8 +7,10 @@ import (
 	"log"
 
 	"github.com/Ali-Assar/car-rental-system/api"
+	"github.com/Ali-Assar/car-rental-system/api/middleware"
 	"github.com/Ali-Assar/car-rental-system/db"
-	"github.com/Ali-Assar/car-rental-system/middleware"
+
+	//"github.com/Ali-Assar/car-rental-system/middleware"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

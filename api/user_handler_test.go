@@ -4,43 +4,14 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
-	"log"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Ali-Assar/car-rental-system/db"
 	"github.com/Ali-Assar/car-rental-system/types"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-const testDbUri = "mongodb://localhost:27017"
-
-//const dbname = "car-rental-system-test"
-
-type testdb struct {
-	db.UserStore
-}
-
-func (tdb *testdb) tearDown(t *testing.T) {
-	if err := tdb.UserStore.Drop(context.TODO()); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func setup(t *testing.T) *testdb {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(testDbUri))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return &testdb{
-		UserStore: db.NewMongoUserStore(client),
-	}
-}
 
 func createUserAndPost(t *testing.T, app *fiber.App, userHandler *UserHandler, params types.CreateUserParams) *types.User {
 	b, _ := json.Marshal(params)
@@ -64,7 +35,7 @@ func TestPostUser(t *testing.T) {
 	defer tdb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb.UserStore)
+	userHandler := NewUserHandler(tdb.User)
 	app.Post("/", userHandler.HandlePostUser) //
 
 	params := types.CreateUserParams{
@@ -90,7 +61,6 @@ func TestPostUser(t *testing.T) {
 	if user.Email != params.Email {
 		t.Errorf("expected the email be %s but got %s", params.Email, user.Email)
 	}
-
 }
 
 func TestGetUser(t *testing.T) {
@@ -98,7 +68,7 @@ func TestGetUser(t *testing.T) {
 	defer tdb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb.UserStore)
+	userHandler := NewUserHandler(tdb.User)
 	app.Post("/", userHandler.HandlePostUser)
 
 	user1Params := &types.CreateUserParams{
@@ -150,7 +120,7 @@ func TestGetUserByID(t *testing.T) {
 	defer tdb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb.UserStore)
+	userHandler := NewUserHandler(tdb.User)
 	app.Post("/", userHandler.HandlePostUser)
 
 	params := &types.CreateUserParams{
@@ -198,7 +168,7 @@ func TestDeleteUserByID(t *testing.T) {
 	defer tdb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb.UserStore)
+	userHandler := NewUserHandler(tdb.User)
 	app.Post("/", userHandler.HandlePostUser)
 
 	params := &types.CreateUserParams{
@@ -231,7 +201,7 @@ func TestUpdateUser(t *testing.T) {
 	defer tdb.tearDown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(tdb.UserStore)
+	userHandler := NewUserHandler(tdb.User)
 	app.Post("/", userHandler.HandlePostUser)
 
 	params := &types.CreateUserParams{

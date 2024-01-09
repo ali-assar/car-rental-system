@@ -2,49 +2,31 @@ package api
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 
-	"github.com/Ali-Assar/car-rental-system/db"
-	"github.com/Ali-Assar/car-rental-system/types"
+	"github.com/Ali-Assar/car-rental-system/db/fixtures"
 	"github.com/gofiber/fiber/v2"
 )
 
-func InsertTestUser(t *testing.T, userStore db.UserStore) *types.User {
-	user, err := types.NewUserFromParams(types.CreateUserParams{
-		Email:     "james@foo.com",
-		FirstName: "james",
-		LastName:  "foo",
-		Password:  "supersecure",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = userStore.InsertUser(context.TODO(), user)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return user
-}
 func TestAuthenticateSuccess(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.tearDown(t)
-	insertedUser := InsertTestUser(t, tdb.UserStore)
+	insertedUser := fixtures.AddUser(tdb.Store, "james", "foo", false)
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
-	app.Post("/", authHandler.HandleAuthenticate)
+	authHandler := NewAuthHandler(tdb.User)
+	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{
 		Email:    "james@foo.com",
-		Password: "supersecure",
+		Password: "james_foo",
 	}
 
 	b, _ := json.Marshal(params)
-	req := httptest.NewRequest("POST", "/", bytes.NewReader(b))
+	req := httptest.NewRequest("POST", "/auth", bytes.NewReader(b))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := app.Test(req)
@@ -74,11 +56,11 @@ func TestAuthenticateSuccess(t *testing.T) {
 func TestAuthenticateWithWrongPassword(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.tearDown(t)
-	InsertTestUser(t, tdb.UserStore)
+	fixtures.AddUser(tdb.Store, "james", "foo", false)
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
-	app.Post("/", authHandler.HandleAuthenticate)
+	authHandler := NewAuthHandler(tdb.User)
+	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{
 		Email:    "james@foo.com",
@@ -86,7 +68,7 @@ func TestAuthenticateWithWrongPassword(t *testing.T) {
 	}
 
 	b, _ := json.Marshal(params)
-	req := httptest.NewRequest("POST", "/", bytes.NewReader(b))
+	req := httptest.NewRequest("POST", "/auth", bytes.NewReader(b))
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := app.Test(req)
