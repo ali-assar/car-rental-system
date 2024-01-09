@@ -13,6 +13,7 @@ type ReservationStore interface {
 	InsertReservation(context.Context, *types.Reservation) (*types.Reservation, error)
 	GetReservation(context.Context, bson.M) ([]*types.Reservation, error)
 	GetReservationByID(context.Context, string) (*types.Reservation, error)
+	UpdateReservation(context.Context, string, bson.M) error
 }
 
 type MongoReservationStore struct {
@@ -28,6 +29,17 @@ func NewMongoReservationStore(client *mongo.Client) *MongoReservationStore {
 		coll:   client.Database(DBNAME).Collection("reservation"),
 	}
 }
+
+func (s *MongoReservationStore) UpdateReservation(ctx context.Context, id string, update bson.M) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	m := bson.M{"$set": update}
+	_, err = s.coll.UpdateByID(ctx, oid, m)
+	return err
+}
+
 func (s *MongoReservationStore) GetReservation(ctx context.Context, filter bson.M) ([]*types.Reservation, error) {
 	cur, err := s.coll.Find(ctx, filter)
 	if err != nil {

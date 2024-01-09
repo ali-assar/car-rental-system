@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Ali-Assar/car-rental-system/db"
-	"github.com/Ali-Assar/car-rental-system/types"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -19,6 +18,30 @@ func NewReservationHandler(store *db.Store) *ReservationHandler {
 	}
 }
 
+func (h *ReservationHandler) HandleCancelReservation(c *fiber.Ctx) error {
+	id := c.Params("id")
+	reservation, err := h.store.Reservation.GetReservationByID(c.Context(), id)
+	if err != nil {
+		return err
+	}
+	user, err := getAuthUser(c)
+	if err != nil {
+		return err
+	}
+	if reservation.UserID != user.ID {
+		return c.Status(http.StatusUnauthorized).JSON(genericResp{
+			Type: "error",
+			Msg:  "not authorized",
+		})
+	}
+	if err := h.store.Reservation.UpdateReservation(c.Context(), c.Params("id"), bson.M{"canceled": true}); err != nil {
+		return err
+	}
+	return c.JSON(genericResp{
+		Type: "msg",
+		Msg:  "updated",
+	})
+}
 func (h *ReservationHandler) HandleGetReservations(c *fiber.Ctx) error {
 	reservation, err := h.store.Reservation.GetReservation(c.Context(), bson.M{})
 	if err != nil {
@@ -33,15 +56,16 @@ func (h *ReservationHandler) HandleGetReservation(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	user, ok := c.Context().UserValue("user").(*types.User)
-	if !ok {
+	user, err := getAuthUser(c)
+	if err != nil {
 		return err
 	}
+
 	if reservation.UserID != user.ID {
-		return c.Status(http.StatusUnauthorized).JSON((genericResp{
+		return c.Status(http.StatusUnauthorized).JSON(genericResp{
 			Type: "error",
 			Msg:  "not authorized",
-		}))
+		})
 	}
 	return c.JSON(reservation)
 }

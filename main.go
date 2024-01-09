@@ -74,8 +74,9 @@ func main() {
 	apiv1.Post("car/:id/reservation", carHandler.HandleReserveCar)
 
 	//reservation handler
-	apiv1.Get("/reservation", reservationHandler.HandleGetReservations)
+	//apiv1.Get("/reservation", reservationHandler.HandleGetReservations)
 	apiv1.Get("/reservation/:id", reservationHandler.HandleGetReservation)
+	apiv1.Get("reservation/:id/cancel", reservationHandler.HandleCancelReservation)
 
 	//admin handlers
 	admin.Get("/reservation", reservationHandler.HandleGetReservations)
