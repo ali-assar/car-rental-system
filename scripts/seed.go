@@ -38,6 +38,6 @@ func main() {
 	fmt.Println("agency ->", agency.ID)
 	car := fixtures.AddCar(store, "sport", "petrol", "BMW", 2017, 100, agency.ID)
 	fmt.Println("car ->", car.ID)
-	reservation := fixtures.AddReservation(*store, user.ID, car.ID, time.Now(), time.Now().AddDate(0, 0, 2))
+	reservation := fixtures.AddReservation(store, user.ID, car.ID, time.Now(), time.Now().AddDate(0, 0, 2))
 	fmt.Println("reservation- >", reservation.ID)
 }

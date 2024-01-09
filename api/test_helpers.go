@@ -11,7 +11,6 @@ import (
 )
 
 const testDbUri = "mongodb://localhost:27017"
-const testDBName = "car_rental_test"
 
 type testdb struct {
 	client *mongo.Client

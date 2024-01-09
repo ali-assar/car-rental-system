@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func AddReservation(store db.Store, userID, carID primitive.ObjectID, from, till time.Time) *types.Reservation {
+func AddReservation(store *db.Store, userID, carID primitive.ObjectID, from, till time.Time) *types.Reservation {
 	reservation := &types.Reservation{
 		UserID:   userID,
 		CarID:    carID,
