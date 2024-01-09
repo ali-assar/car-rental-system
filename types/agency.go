@@ -10,21 +10,6 @@ type Agency struct {
 	Rating   int                  `bson:"rating" json:"rating"`
 }
 
-type CarType int
-
-const (
-	_ CarType = iota
-	EconomyCarsType
-	CompactCarsType
-	SUVCarsType
-	SportCarsType
-	MinivanCarsType
-	CargoVanType
-	LuxuryCarsType
-	FullSizeCarsType
-	MuscleCar
-)
-
 type Car struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Type     string             `bson:"type" json:"type"`

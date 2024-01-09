@@ -12,6 +12,7 @@ import (
 type ReservationStore interface {
 	InsertReservation(context.Context, *types.Reservation) (*types.Reservation, error)
 	GetReservation(context.Context, bson.M) ([]*types.Reservation, error)
+	GetReservationByID(context.Context, string) (*types.Reservation, error)
 }
 
 type MongoReservationStore struct {
@@ -46,4 +47,16 @@ func (s *MongoReservationStore) InsertReservation(ctx context.Context, reservati
 	}
 	reservation.ID = resp.InsertedID.(primitive.ObjectID)
 	return reservation, nil
+}
+
+func (s *MongoReservationStore) GetReservationByID(ctx context.Context, id string) (*types.Reservation, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	var reservation types.Reservation
+	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&reservation); err != nil {
+		return nil, err
+	}
+	return &reservation, nil
 }

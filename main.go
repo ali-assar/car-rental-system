@@ -43,13 +43,15 @@ func main() {
 			Reservation: reservationStore,
 		}
 
-		userHandler   = api.NewUserHandler(userStore)
-		agencyHandler = api.NewAgencyHandler(store)
-		authHandler   = api.NewAuthHandler(userStore)
-		carHandler    = api.NewCarHandler(store)
-		app           = fiber.New(config)
-		auth          = app.Group("/api")
-		apiv1         = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
+		userHandler        = api.NewUserHandler(userStore)
+		agencyHandler      = api.NewAgencyHandler(store)
+		authHandler        = api.NewAuthHandler(userStore)
+		carHandler         = api.NewCarHandler(store)
+		reservationHandler = api.NewReservationHandler(store)
+		app                = fiber.New(config)
+		auth               = app.Group("/api")
+		apiv1              = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
+		admin              = apiv1.Group("/admin", middleware.AdminAuth)
 	)
 
 	//auth
@@ -66,8 +68,17 @@ func main() {
 	apiv1.Get("/agency", agencyHandler.HandleGetAgencies)
 	apiv1.Get("/agency/:id", agencyHandler.HandleGetAgency)
 	apiv1.Get("/agency/:id/cars", agencyHandler.HandleGetCars)
+
+	//car handlers
 	apiv1.Get("/car", carHandler.HandleGetCars)
 	apiv1.Post("car/:id/reservation", carHandler.HandleReserveCar)
+
+	//reservation handler
+	apiv1.Get("/reservation", reservationHandler.HandleGetReservations)
+	apiv1.Get("/reservation/:id", reservationHandler.HandleGetReservation)
+
+	//admin handlers
+	admin.Get("/reservation", reservationHandler.HandleGetReservations)
 
 	app.Listen(*listenAddr)
 }
