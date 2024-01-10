@@ -53,7 +53,19 @@ func TestAdminGetReservation(t *testing.T) {
 		t.Fatalf("expected at lease 1 reservation but got %d", len(reservations))
 	}
 	if !reflect.DeepEqual(reservation.ID, reservations[0].ID) {
-		t.Fatalf("the inserted reservation is %s\n but the fetched reservation is %s\n", reservation.ID, reservations[0].ID)
+		t.Fatalf("the inserted reservation ID is %s\n but the fetched reservation ID is %s\n", reservation.ID, reservations[0].ID)
 	}
-	fmt.Println(reservations)
+
+	// testing  reservations cannot be fetched by a user
+	req = httptest.NewRequest("GET", "/", nil)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("X-Api-Token", CreateTokenFromUser(user))
+
+	resp, err = app.Test(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode == http.StatusOK {
+		t.Fatalf("expected not 200 code but got, %d", http.StatusOK)
+	}
 }
