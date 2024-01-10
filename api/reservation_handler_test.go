@@ -26,7 +26,7 @@ func TestUserGetReservation(t *testing.T) {
 		from               = time.Now()
 		till               = from.AddDate(0, 0, 5)
 		reservation        = fixtures.AddReservation(db.Store, user.ID, car.ID, from, till)
-		app                = fiber.New()
+		app                = fiber.New(fiber.Config{ErrorHandler: ErrorHandler})
 		route              = app.Group("/", JWTAuthentication(db.User))
 		reservationHandler = NewReservationHandler(db.Store)
 	)
@@ -73,7 +73,7 @@ func TestAdminGetReservation(t *testing.T) {
 		from               = time.Now()
 		till               = from.AddDate(0, 0, 5)
 		reservation        = fixtures.AddReservation(db.Store, user.ID, car.ID, from, till)
-		app                = fiber.New()
+		app                = fiber.New(fiber.Config{ErrorHandler: ErrorHandler})
 		admin              = app.Group("/", JWTAuthentication(db.User), AdminAuth)
 		reservationHandler = NewReservationHandler(db.Store)
 	)
@@ -112,7 +112,7 @@ func TestAdminGetReservation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if resp.StatusCode == http.StatusOK {
-		t.Fatalf("expected not 200 code but got, %d", http.StatusOK)
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("expected status unauthorized but got, %d", resp.StatusCode)
 	}
 }

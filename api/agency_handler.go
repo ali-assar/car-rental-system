@@ -27,7 +27,7 @@ func (a *AgencyHandler) HandleGetCars(c *fiber.Ctx) error {
 	filter := bson.M{"agencyID": oid}
 	cars, err := a.store.Car.GetCars(c.Context(), filter)
 	if err != nil {
-		return err
+		return ErrNotFound("agency")
 	}
 
 	return c.JSON(cars)
@@ -37,12 +37,12 @@ func (a *AgencyHandler) HandleGetAgency(c *fiber.Ctx) error {
 	id := c.Params("id")
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		return ErrInvalidID()
 	}
 
 	agency, err := a.store.Agency.GetAgencyByID(c.Context(), oid)
 	if err != nil {
-		return err
+		return ErrNotFound("agency")
 	}
 	return c.JSON(agency)
 }
@@ -50,7 +50,7 @@ func (a *AgencyHandler) HandleGetAgency(c *fiber.Ctx) error {
 func (a *AgencyHandler) HandleGetAgencies(c *fiber.Ctx) error {
 	agencies, err := a.store.Agency.GetAgencies(c.Context(), nil)
 	if err != nil {
-		return err
+		return ErrNotFound("agency")
 	}
 	return c.JSON(agencies)
 }
