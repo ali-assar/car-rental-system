@@ -54,7 +54,7 @@ func NewCarHandler(store *db.Store) *CarHandler {
 }
 
 func (h *CarHandler) HandleGetCars(c *fiber.Ctx) error {
-	cars, err := h.store.Car.GetCars(c.Context(), bson.M{})
+	cars, err := h.store.Car.GetCars(c.Context(), db.Map{})
 	if err != nil {
 		return err
 	}

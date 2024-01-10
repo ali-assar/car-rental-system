@@ -11,9 +11,9 @@ import (
 
 type AgencyStore interface {
 	InsertAgency(context.Context, *types.Agency) (*types.Agency, error)
-	UpdateAgency(context.Context, bson.M, bson.M) error
-	GetAgencies(context.Context, bson.M) ([]*types.Agency, error)
-	GetAgencyByID(context.Context, primitive.ObjectID) (*types.Agency, error)
+	UpdateAgency(context.Context, Map, Map) error
+	GetAgencies(context.Context, Map) ([]*types.Agency, error)
+	GetAgencyByID(context.Context, string) (*types.Agency, error)
 }
 
 type MongoAgencyStore struct {
@@ -28,16 +28,20 @@ func NewMongoAgencyStore(client *mongo.Client) *MongoAgencyStore {
 	}
 }
 
-func (s *MongoAgencyStore) GetAgencyByID(ctx context.Context, id primitive.ObjectID) (*types.Agency, error) {
+func (s *MongoAgencyStore) GetAgencyByID(ctx context.Context, id string) (*types.Agency, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
 	var agency types.Agency
-	if err := s.coll.FindOne(ctx, bson.M{"_id": id}).Decode(&agency); err != nil {
+	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&agency); err != nil {
 		return nil, err
 	}
 
 	return &agency, nil
 }
 
-func (s *MongoAgencyStore) GetAgencies(ctx context.Context, filter bson.M) ([]*types.Agency, error) {
+func (s *MongoAgencyStore) GetAgencies(ctx context.Context, filter Map) ([]*types.Agency, error) {
 	resp, err := s.coll.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -49,7 +53,7 @@ func (s *MongoAgencyStore) GetAgencies(ctx context.Context, filter bson.M) ([]*t
 	return agencies, err
 }
 
-func (s *MongoAgencyStore) UpdateAgency(ctx context.Context, filter, update bson.M) error {
+func (s *MongoAgencyStore) UpdateAgency(ctx context.Context, filter, update Map) error {
 	_, err := s.coll.UpdateOne(ctx, filter, update)
 	return err
 }

@@ -11,7 +11,7 @@ import (
 
 type CarStore interface {
 	InsertCar(context.Context, *types.Car) (*types.Car, error)
-	GetCars(context.Context, bson.M) ([]*types.Car, error)
+	GetCars(context.Context, Map) ([]*types.Car, error)
 }
 
 type MongoCarStore struct {
@@ -29,7 +29,7 @@ func NewMongoCarStore(client *mongo.Client, agencyStore AgencyStore) *MongoCarSt
 	}
 }
 
-func (s *MongoCarStore) GetCars(ctx context.Context, filter bson.M) ([]*types.Car, error) {
+func (s *MongoCarStore) GetCars(ctx context.Context, filter Map) ([]*types.Car, error) {
 	resp, err := s.coll.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -50,8 +50,8 @@ func (s *MongoCarStore) InsertCar(ctx context.Context, car *types.Car) (*types.C
 	car.ID = resp.InsertedID.(primitive.ObjectID)
 
 	//update the hotel with this room id
-	filter := bson.M{"_id": car.AgencyID}
-	update := bson.M{"$push": bson.M{"cars": car.ID}}
+	filter := Map{"_id": car.AgencyID}
+	update := Map{"$push": bson.M{"cars": car.ID}}
 	if err := s.AgencyStore.UpdateAgency(ctx, filter, update); err != nil {
 		return nil, err
 	}
