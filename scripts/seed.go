@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/Ali-Assar/car-rental-system/api"
@@ -35,9 +36,14 @@ func main() {
 	admin := fixtures.AddUser(store, "admin", "admin", true)
 	fmt.Println("admin token ->", api.CreateTokenFromUser(admin))
 	agency := fixtures.AddAgency(store, "voom voom", "rome", 2, nil)
-	fmt.Println("agency ->", agency.ID)
 	car := fixtures.AddCar(store, "sport", "petrol", "BMW", 2017, 100, agency.ID)
-	fmt.Println("car ->", car.ID)
 	reservation := fixtures.AddReservation(store, user.ID, car.ID, time.Now(), time.Now().AddDate(0, 0, 2))
 	fmt.Println("reservation- >", reservation.ID)
+
+	for i := 0; i < 100; i++ {
+		name := fmt.Sprintf("fake agency %d", i)
+		location := fmt.Sprintf("fake location %d", i)
+
+		fixtures.AddAgency(store, name, location, rand.Intn(5)+1, nil)
+	}
 }

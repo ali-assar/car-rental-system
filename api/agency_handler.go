@@ -41,10 +41,32 @@ func (a *AgencyHandler) HandleGetAgency(c *fiber.Ctx) error {
 	return c.JSON(agency)
 }
 
+type ResourceResp struct {
+	Results int `json:"results"`
+	Data    any `json:"data"`
+	Page    int `json:"page"`
+}
+
+type AgencyQueryParams struct {
+	db.Pagination
+	Rating int
+}
+
 func (a *AgencyHandler) HandleGetAgencies(c *fiber.Ctx) error {
-	agencies, err := a.store.Agency.GetAgencies(c.Context(), nil)
-	if err != nil {
-		return ErrNotFound("agency")
+	var params AgencyQueryParams
+	if err := c.QueryParser(&params); err != nil {
+		return ErrBadRequest()
 	}
-	return c.JSON(agencies)
+
+	filter := db.Map{"rating": params.Rating}
+	agencies, err := a.store.Agency.GetAgencies(c.Context(), filter, &params.Pagination)
+	if err != nil {
+		return ErrNotFound("agencies")
+	}
+	resp := ResourceResp{
+		Data:    agencies,
+		Results: len(agencies),
+		Page:    int(params.Pagination.Page),
+	}
+	return c.JSON(resp)
 }

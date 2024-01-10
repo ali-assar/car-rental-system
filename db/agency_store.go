@@ -7,12 +7,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type AgencyStore interface {
 	InsertAgency(context.Context, *types.Agency) (*types.Agency, error)
 	UpdateAgency(context.Context, Map, Map) error
-	GetAgencies(context.Context, Map) ([]*types.Agency, error)
+	GetAgencies(context.Context, Map, *Pagination) ([]*types.Agency, error)
 	GetAgencyByID(context.Context, string) (*types.Agency, error)
 }
 
@@ -41,8 +42,11 @@ func (s *MongoAgencyStore) GetAgencyByID(ctx context.Context, id string) (*types
 	return &agency, nil
 }
 
-func (s *MongoAgencyStore) GetAgencies(ctx context.Context, filter Map) ([]*types.Agency, error) {
-	resp, err := s.coll.Find(ctx, filter)
+func (s *MongoAgencyStore) GetAgencies(ctx context.Context, filter Map, pag *Pagination) ([]*types.Agency, error) {
+	opts := options.FindOptions{}
+	opts.SetSkip((pag.Page - 1) * pag.Limit)
+	opts.SetLimit(pag.Limit)
+	resp, err := s.coll.Find(ctx, filter, &opts)
 	if err != nil {
 		return nil, err
 	}
