@@ -20,7 +20,7 @@ func TestUserGetReservation(t *testing.T) {
 	defer db.tearDown(t)
 
 	var (
-		//nonAuthUser        = fixtures.AddUser(db.Store, "james", "wrong", false)
+		wrongUser          = fixtures.AddUser(db.Store, "james", "wrong", false)
 		user               = fixtures.AddUser(db.Store, "james", "foo", false)
 		agency             = fixtures.AddAgency(db.Store, "voom voom", "rome", 3, nil)
 		car                = fixtures.AddCar(db.Store, "sport", "petrol", "BMW", 2017, 100, agency.ID)
@@ -50,6 +50,17 @@ func TestUserGetReservation(t *testing.T) {
 	if !reflect.DeepEqual(reservation.ID, reservationResp.ID) {
 		t.Fatalf("the inserted reservation ID is %s\n but the fetched reservation ID is %s\n", reservation.ID, reservationResp.ID)
 	}
+
+	req = httptest.NewRequest("GET", fmt.Sprintf("/%s", reservation.ID.Hex()), nil)
+	req.Header.Add("X-Api-Token", CreateTokenFromUser(wrongUser))
+	resp, err = app.Test(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode == http.StatusOK {
+		t.Fatalf("expected not 200 code but got, %d", http.StatusOK)
+	}
+
 }
 
 func TestAdminGetReservation(t *testing.T) {
