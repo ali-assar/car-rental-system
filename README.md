@@ -74,14 +74,12 @@ Refer to the source code for a complete list of endpoints and their functionalit
 ## Project Structure
 Briefly describe the high-level project structure and the purpose of each directory or package.
 
-```
 ├── api/            # API handlers
 ├── db/             # Database models and stores
 ├── middleware/     # Custom middleware (if any)
 ├── .env            # Environment variable configuration
 ├── main.go         # Main application entry point
 └── ...
-```
 
 ## Makefile
 The Makefile provides convenient commands for building, running, and testing the Car Rental System. Use the following commands:
