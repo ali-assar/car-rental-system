@@ -1,7 +1,5 @@
-Certainly! To improve the README.md with your specific information, let's add placeholders for your username and any other details you want to include. Here's an updated version:
-
 ```markdown
-# GoCarRental
+# Go Car Rental System
 
 ## Overview
 GoCarRental is a Go-based application that provides an API for managing car rental operations, including user authentication, agency management, car listing, and reservation handling. This document provides essential information for setting up, using, and contributing to the project.
