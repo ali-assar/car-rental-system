@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"os"
 
 	"github.com/Ali-Assar/car-rental-system/types"
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,9 +23,10 @@ type MongoCarStore struct {
 }
 
 func NewMongoCarStore(client *mongo.Client, agencyStore AgencyStore) *MongoCarStore {
+	DbName := os.Getenv("MONGO_DB_NAME")
 	return &MongoCarStore{
 		client:      client,
-		coll:        client.Database(DBNAME).Collection("cars"),
+		coll:        client.Database(DbName).Collection("cars"),
 		AgencyStore: agencyStore,
 	}
 }

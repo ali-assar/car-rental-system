@@ -1,10 +1,8 @@
 package db
 
-const (
-	DBNAME     = "car-rental-system"
-	TestDBNAME = "car-rental-system-Test"
-	DBURI      = "mongodb://localhost:27017"
-)
+import "os"
+
+var DBNAME = os.Getenv("MONGO_DB_NAME")
 
 type Pagination struct {
 	Limit int64

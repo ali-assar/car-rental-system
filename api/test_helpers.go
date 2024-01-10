@@ -3,14 +3,14 @@ package api
 import (
 	"context"
 	"log"
+	"os"
 	"testing"
 
 	"github.com/Ali-Assar/car-rental-system/db"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-const testDbUri = "mongodb://localhost:27017"
 
 type testdb struct {
 	client *mongo.Client
@@ -18,14 +18,16 @@ type testdb struct {
 }
 
 func (tdb *testdb) tearDown(t *testing.T) {
-	if err := tdb.client.Database(db.DBNAME).Drop(context.TODO()); err != nil {
+	dbName := os.Getenv("MONGO_DB_NAME")
+	if err := tdb.client.Database(dbName).Drop(context.TODO()); err != nil {
 		log.Fatal(err)
 	}
 
 }
 
 func setup(t *testing.T) *testdb {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(testDbUri))
+	dburi := os.Getenv("MONGO_DB_URL_TEST")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dburi))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,5 +40,11 @@ func setup(t *testing.T) *testdb {
 			Car:         db.NewMongoCarStore(client, agencyStore),
 			Reservation: db.NewMongoReservationStore(client),
 		},
+	}
+}
+
+func init() {
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatal(err)
 	}
 }
