@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"net/http"
 
 	"log"
 
 	"github.com/Ali-Assar/car-rental-system/api"
-	"github.com/Ali-Assar/car-rental-system/api/middleware"
 	"github.com/Ali-Assar/car-rental-system/db"
 
 	//"github.com/Ali-Assar/car-rental-system/middleware"
@@ -19,7 +19,11 @@ import (
 // Create a new fiber instance with custom config
 var config = fiber.Config{
 	ErrorHandler: func(c *fiber.Ctx, err error) error {
-		return c.JSON(map[string]string{"error": err.Error()})
+		if apiError, ok := err.(api.Error); ok {
+			return c.Status(apiError.Code).JSON(apiError)
+		}
+		apiError := api.NewError(http.StatusInternalServerError, err.Error())
+		return c.Status(apiError.Code).JSON(apiError)
 	},
 }
 
@@ -52,8 +56,8 @@ func main() {
 		reservationHandler = api.NewReservationHandler(store)
 		app                = fiber.New(config)
 		auth               = app.Group("/api")
-		apiv1              = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
-		admin              = apiv1.Group("/admin", middleware.AdminAuth)
+		apiv1              = app.Group("/api/v1", api.JWTAuthentication(userStore))
+		admin              = apiv1.Group("/admin", api.AdminAuth)
 	)
 
 	//auth

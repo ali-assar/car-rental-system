@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Ali-Assar/car-rental-system/api/middleware"
 	"github.com/Ali-Assar/car-rental-system/db/fixtures"
 	"github.com/Ali-Assar/car-rental-system/types"
 	"github.com/gofiber/fiber/v2"
@@ -28,7 +27,7 @@ func TestUserGetReservation(t *testing.T) {
 		till               = from.AddDate(0, 0, 5)
 		reservation        = fixtures.AddReservation(db.Store, user.ID, car.ID, from, till)
 		app                = fiber.New()
-		route              = app.Group("/", middleware.JWTAuthentication(db.User))
+		route              = app.Group("/", JWTAuthentication(db.User))
 		reservationHandler = NewReservationHandler(db.Store)
 	)
 
@@ -75,7 +74,7 @@ func TestAdminGetReservation(t *testing.T) {
 		till               = from.AddDate(0, 0, 5)
 		reservation        = fixtures.AddReservation(db.Store, user.ID, car.ID, from, till)
 		app                = fiber.New()
-		admin              = app.Group("/", middleware.JWTAuthentication(db.User), middleware.AdminAuth)
+		admin              = app.Group("/", JWTAuthentication(db.User), AdminAuth)
 		reservationHandler = NewReservationHandler(db.Store)
 	)
 	_ = reservation

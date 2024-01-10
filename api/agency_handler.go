@@ -21,7 +21,7 @@ func (a *AgencyHandler) HandleGetCars(c *fiber.Ctx) error {
 	id := c.Params("id")
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		return ErrInvalidID()
 	}
 
 	filter := bson.M{"agencyID": oid}
