@@ -56,6 +56,9 @@ func generateOBUIDs(n int) []int {
 	return ids
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
+// func init() {
+// 	//rand.Seed(time.Now().UnixNano())
+// 	//rand.New(NewSource(seed))
+// 	// Replace the above line with the following line:
+// 	//rand.Seed(rand.New(rand.NewSource(time.Now().UnixNano())).Int63())
+// }
