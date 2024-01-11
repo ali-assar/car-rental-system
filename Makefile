@@ -4,6 +4,11 @@ run: build
 	@./bin/api
 seed:
 	@go run scripts/seed.go
+obu:
+	@go build -o bin/obu ./obu
+	@./bin/obu
+
+.PHONY: obu
 docker:
 	@echo "building Docker image"
 	@docker build -t api .
