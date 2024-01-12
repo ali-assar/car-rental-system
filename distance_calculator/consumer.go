@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/Ali-Assar/car-rental-system/types"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
@@ -54,6 +53,6 @@ func (c *KafkaConsumer) readMessageLoop() {
 			logrus.Errorf("calculation error: %s", err)
 			continue
 		}
-		fmt.Printf("distance %.2f\n", distance)
+		_ = distance
 	}
 }
