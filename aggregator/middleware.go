@@ -22,7 +22,7 @@ func (l *logMiddleware) AggregateDistance(distance types.Distance) (err error) {
 		logrus.WithFields(logrus.Fields{
 			"took":  time.Since(start),
 			"error": err,
-		}).Info("")
+		}).Info("aggregate distance")
 	}(time.Now())
 	err = l.next.AggregateDistance(distance)
 	return
