@@ -10,7 +10,6 @@ import (
 	"github.com/Ali-Assar/car-rental-system/db"
 	"github.com/joho/godotenv"
 
-	//"github.com/Ali-Assar/car-rental-system/middleware"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -85,6 +84,6 @@ func main() {
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
+		log.Fatal("Error loading .env file:", err)
 	}
 }

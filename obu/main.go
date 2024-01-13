@@ -25,7 +25,6 @@ func genCoord() float64 {
 
 }
 func main() {
-
 	for {
 		obuIDs := generateOBUIDs(20)
 		conn, _, err := websocket.DefaultDialer.Dial(wsEndpoint, nil)
@@ -43,7 +42,6 @@ func main() {
 				log.Fatal(err)
 			}
 		}
-
 		time.Sleep(sendInterval)
 	}
 }
@@ -55,10 +53,3 @@ func generateOBUIDs(n int) []int {
 	}
 	return ids
 }
-
-// func init() {
-// 	//rand.Seed(time.Now().UnixNano())
-// 	//rand.New(NewSource(seed))
-// 	// Replace the above line with the following line:
-// 	//rand.Seed(rand.New(rand.NewSource(time.Now().UnixNano())).Int63())
-// }
