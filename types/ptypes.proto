@@ -1,0 +1,15 @@
+syntax= "proto3";
+
+option go_package = "github.com/Ali-Assar/car-rental-system/types";
+
+service Aggregator {
+	rpc Aggregate(AggregateRequest) returns (None);
+}
+
+message None {}
+
+message AggregateRequest {
+	int32 ObuID = 1;
+	double Value = 2;
+	int64 Unix = 3;
+} 
