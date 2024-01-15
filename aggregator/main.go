@@ -13,22 +13,30 @@ import (
 )
 
 func main() {
-	listenAddr := flag.String("listenaddr", ":3000", "the listen address of http server")
+	httpListenAddr := flag.String("httpAddr", ":3000", "the listen address of HTTP server")
+	grpcListenAddr := flag.String("grpcAddr", ":3001", "the listen address of GRPC server")
 	flag.Parse()
 	var (
 		store = NewMemoryStore()
 		svc   = NewInvoiceAggregator(store)
 	)
 	svc = NewLogMiddleware(svc)
-	makeHTTPTransport(*listenAddr, svc)
+	go makeGRPCTransport(*grpcListenAddr, svc)
+	makeHTTPTransport(*httpListenAddr, svc)
 }
 
-func makeGRPCTransport(listenAddr string) error {
+func makeGRPCTransport(listenAddr string, svc Aggregator) error {
+	fmt.Println("GRPC transport running on port", listenAddr)
+	// Generate a TCP listener
 	listener, err := net.Listen("TCP", listenAddr)
 	if err != nil {
 		return err
 	}
+	defer listener.Close()
+	// Make a new GRPC native server
 	server := grpc.NewServer([]grpc.ServerOption{}...)
+	//Register (our) GRPC server implementation to the GRPC package
+	types.RegisterAggregatorServer(server, NewGRPCAggregatorServer(svc))
 	return server.Serve(listener)
 }
 
