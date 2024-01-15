@@ -1,6 +1,10 @@
 package main
 
-import "github.com/Ali-Assar/car-rental-system/types"
+import (
+	"context"
+
+	"github.com/Ali-Assar/car-rental-system/types"
+)
 
 type GRPcAggregatorServer struct {
 	types.UnimplementedAggregatorServer
@@ -13,11 +17,11 @@ func NewGRPCAggregatorServer(svc Aggregator) *GRPcAggregatorServer {
 	}
 }
 
-func (s *GRPcAggregatorServer) AggregateDistance(req *types.AggregateRequest) error {
+func (s *GRPcAggregatorServer) AggregateD(ctx context.Context, req *types.AggregateRequest) (*types.None, error) {
 	distance := types.Distance{
 		OBUID: int(req.ObuID),
 		Value: req.Value,
 		Unix:  req.Unix,
 	}
-	return s.svc.AggregateDistance(distance)
+	return &types.None{}, s.svc.AggregateDistance(distance)
 }
