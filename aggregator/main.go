@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 
 	"github.com/Ali-Assar/car-rental-system/types"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -19,6 +21,15 @@ func main() {
 	)
 	svc = NewLogMiddleware(svc)
 	makeHTTPTransport(*listenAddr, svc)
+}
+
+func makeGRPCTransport(listenAddr string) error {
+	listener, err := net.Listen("TCP", listenAddr)
+	if err != nil {
+		return err
+	}
+	server := grpc.NewServer([]grpc.ServerOption{}...)
+	return server.Serve(listener)
 }
 
 func makeHTTPTransport(listenAddr string, svc Aggregator) {
