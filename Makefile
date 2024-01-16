@@ -5,6 +5,9 @@ api:
 seed:
 	@go run scripts/seed.go
 
+gate:
+	@go build -o bin/gate ./gateway
+	@./bin/gate
 obu:
 	@go build -o bin/obu ./obu
 	@./bin/obu
@@ -27,4 +30,4 @@ test:
 proto:
 	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative types/ptypes.proto
 
-.PHONY: deps build run seed obu receiver calculator agg test api
+.PHONY: deps build run seed obu receiver calculator agg test api gate
