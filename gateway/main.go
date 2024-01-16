@@ -17,7 +17,7 @@ func main() {
 	listenAddr := flag.String("HTTP listenAddr", ":6000", "the listen address of HTTP server")
 	flag.Parse()
 	var (
-		client     = client.NewHTTPClient("TODO")
+		client     = client.NewHTTPClient("http://localhost:3000")
 		invHandler = NewInvocieHandler(client)
 	)
 	http.HandleFunc("/invoice", makeApiFunc(invHandler.handleGetInvoice))

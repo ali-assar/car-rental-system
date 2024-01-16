@@ -20,12 +20,31 @@ func NewHTTPClient(endpoint string) *HTTPClient {
 	}
 }
 
-func (C *HTTPClient) GetInvoice(ctx context.Context, id int) (*types.Invoice, error) {
-	return &types.Invoice{
-		OBUID:         id,
-		TotalDistance: 40004.4,
-		TotalAmount:   1000000,
-	}, nil
+func (c *HTTPClient) GetInvoice(ctx context.Context, id int) (*types.Invoice, error) {
+	invReq := types.GetInvoiceRequest{
+		ObuID: int32(id),
+	}
+	b, err := json.Marshal(&invReq)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequest("POST", c.Endpoint+"/invoice", bytes.NewReader(b))
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("the service responded with non 200 code. the code: %d", resp.StatusCode)
+	}
+	var invoice types.Invoice
+	if err := json.NewDecoder(resp.Body).Decode(&invoice); err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return &invoice, nil
 }
 
 func (c *HTTPClient) Aggregate(ctx context.Context, aggReq *types.AggregateRequest) error {
@@ -33,7 +52,7 @@ func (c *HTTPClient) Aggregate(ctx context.Context, aggReq *types.AggregateReque
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewReader(b))
+	req, err := http.NewRequest("POST", c.Endpoint+"/aggregate", bytes.NewReader(b))
 	if err != nil {
 		return err
 	}
@@ -44,5 +63,6 @@ func (c *HTTPClient) Aggregate(ctx context.Context, aggReq *types.AggregateReque
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("the service responded with non 200 code. the code: %d", resp.StatusCode)
 	}
+	resp.Body.Close()
 	return nil
 }
