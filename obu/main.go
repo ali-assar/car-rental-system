@@ -48,7 +48,7 @@ func main() {
 func generateOBUIDs(n int) []int {
 	ids := make([]int, n)
 	for i := 0; i < n; i++ {
-		ids[i] = int(rand.Uint64())
+		ids[i] = rand.Intn(999999) //todo fix the negative part of obu id
 	}
 	return ids
 }
