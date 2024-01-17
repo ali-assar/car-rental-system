@@ -15,9 +15,10 @@ type apiFunc func(w http.ResponseWriter, r *http.Request) error
 
 func main() {
 	listenAddr := flag.String("HTTP listenAddr", ":6000", "the listen address of HTTP server")
+	aggregatorServiceAddr := flag.String("aggServiceAddr", "http://localhost:3000", "the listen address of aggregator service")
 	flag.Parse()
 	var (
-		client     = client.NewHTTPClient("http://localhost:3000")
+		client     = client.NewHTTPClient(*aggregatorServiceAddr)
 		invHandler = NewInvocieHandler(client)
 	)
 	http.HandleFunc("/invoice", makeApiFunc(invHandler.handleGetInvoice))
@@ -38,7 +39,7 @@ func NewInvocieHandler(c client.Client) *InvoiceHandler {
 
 func (h *InvoiceHandler) handleGetInvoice(w http.ResponseWriter, r *http.Request) error {
 
-	invoice, err := h.client.GetInvoice(context.Background(), 54558)
+	invoice, err := h.client.GetInvoice(context.Background(), 1659034394)
 	if err != nil {
 		return err
 	}
