@@ -1,7 +1,9 @@
----
 version: '2'
-services:
 
+volumes:
+  prometheus_data: {}
+
+services:
   broker:
     image: confluentinc/cp-kafka:7.5.3
     hostname: broker
@@ -28,4 +30,16 @@ services:
       # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid" 
       # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
       CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+
+  prometheus:
+    container_name: prometheus
+    hostname: prometheus
+    image: prom/prometheus
+    volumes:
+      - /home/ali/repos/car-rental-system/.config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
 

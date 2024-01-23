@@ -28,7 +28,7 @@ func main() {
 		obuIDs := generateOBUIDs(20)
 		conn, _, err := websocket.DefaultDialer.Dial(wsEndpoint, nil)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln(err)
 		}
 		for i := 0; i < len(obuIDs); i++ {
 			lat, long := genLatLong()
