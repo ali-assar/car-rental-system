@@ -35,10 +35,9 @@ services:
     container_name: prometheus
     hostname: prometheus
     image: prom/prometheus
-  
     network_mode: host
     volumes:
-      - /home/ali/repos/car-rental-system/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
