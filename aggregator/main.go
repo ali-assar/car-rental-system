@@ -10,13 +10,14 @@ import (
 	"strconv"
 
 	"github.com/Ali-Assar/car-rental-system/types"
+	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 )
 
 func main() {
 	var (
-		store          = NewMemoryStore()
+		store          = makeStore()
 		svc            = NewInvoiceAggregator(store)
 		grpcListenAddr = os.Getenv("AGG_GRPC_ENDPOINT")
 		httpListenAddr = os.Getenv("AGG_HTTP_ENDPOINT")
@@ -57,7 +58,10 @@ func makeHTTPTransport(listenAddr string, svc Aggregator) error {
 
 func handleGetInvoice(svc Aggregator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
+		if r.Method != "GET" {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "method not supported"})
+			return
+		}
 		values, ok := r.URL.Query()["obu"]
 		if !ok {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "OBU id is missing"})
@@ -96,8 +100,25 @@ func handleAggregate(svc Aggregator) http.HandlerFunc {
 
 }
 
+func makeStore() Storer {
+	storeType := os.Getenv("AGG_STORE_TYPE")
+	switch storeType {
+	case "memory":
+		return NewMemoryStore()
+	default:
+		log.Fatalf("invalid store type given %s", storeType)
+	}
+	return nil
+}
+
 func writeJSON(w http.ResponseWriter, status int, v any) error {
 	w.WriteHeader(status)
 	w.Header().Add("Content-Type", "application/json")
 	return json.NewEncoder(w).Encode(v)
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file:", err)
+	}
 }
