@@ -8,7 +8,7 @@ import (
 
 const (
 	kafkaTopic        = "obudata"
-	aggregateEndPoint = "http://localhost:3000"
+	aggregateEndPoint = "http://localhost:30000"
 )
 
 func main() {
