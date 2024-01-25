@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
+	"math/rand"
 	"net/http"
 
 	"github.com/Ali-Assar/car-rental-system/types"
@@ -69,8 +71,11 @@ func (dr *DataReceiver) wsReceiveLoop() {
 			log.Fatal("reed err: ", err)
 			continue
 		}
+		data.RequestID = rand.Intn(math.MaxInt)
 		if err := dr.produceData(data); err != nil {
 			fmt.Println("kafka produce error", err)
 		}
 	}
 }
+
+//todo logging

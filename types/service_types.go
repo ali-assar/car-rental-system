@@ -6,9 +6,10 @@ type Invoice struct {
 	TotalAmount   float64 `json:"totalAmount"`
 }
 type OBUData struct {
-	OBUID int     `json:"obuID"`
-	Lat   float64 `json:"lat"`
-	Long  float64 `json:"long"`
+	OBUID     int     `json:"obuID"`
+	Lat       float64 `json:"lat"`
+	Long      float64 `json:"long"`
+	RequestID int     `json:"requestID"`
 }
 
 type Distance struct {
