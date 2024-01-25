@@ -2,10 +2,9 @@ package aggservice
 
 import (
 	"context"
-	"os"
 
 	"github.com/Ali-Assar/car-rental-system/types"
-	"github.com/go-kit/kit/log"
+	"github.com/go-kit/log"
 )
 
 const basePrice = 3.5
@@ -48,12 +47,7 @@ func (svc *BasicService) Calculate(_ context.Context, obuID int) (*types.Invoice
 
 // New will construct a complete micro service
 // with logging and instrumentation middleware
-func New() Service {
-	var logger log.Logger
-	{
-		logger = log.NewLogfmtLogger(os.Stdout)
-		logger = log.With(logger, "service", "aggregator")
-	}
+func New(logger log.Logger) Service {
 	var svc Service
 	{
 		svc = newBasicService(NewMemoryStore())

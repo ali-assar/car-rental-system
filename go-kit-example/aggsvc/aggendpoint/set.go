@@ -27,7 +27,7 @@ func New(svc aggservice.Service, logger log.Logger) Set {
 		// Note, rate is defined as a time interval between requests.
 		aggregateEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 1))(aggregateEndpoint)
 		aggregateEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(aggregateEndpoint)
-		//aggregateEndpoint = LoggingMiddleware(log.With(logger, "method", "Sum"))(aggregateEndpoint)
+		aggregateEndpoint = LoggingMiddleware(log.With(logger, "method", "Aggregate"))(aggregateEndpoint)
 		// aggregateEndpoint = InstrumentingMiddleware(duration.With("method", "Sum"))(aggregateEndpoint)
 	}
 	var calculateEndpoint endpoint.Endpoint
@@ -37,7 +37,7 @@ func New(svc aggservice.Service, logger log.Logger) Set {
 		// Note, rate is defined as a number of requests per second.
 		calculateEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Limit(1), 100))(calculateEndpoint)
 		calculateEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(calculateEndpoint)
-		// concatEndpoint = LoggingMiddleware(log.With(logger, "method", "Concat"))(concatEndpoint)
+		calculateEndpoint = LoggingMiddleware(log.With(logger, "method", "invoice"))(calculateEndpoint)
 		// concatEndpoint = InstrumentingMiddleware(duration.With("method", "Concat"))(concatEndpoint)
 	}
 	return Set{
