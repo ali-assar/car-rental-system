@@ -20,12 +20,12 @@ func newLoggingMiddleware() Middleware {
 	}
 }
 
-func (mw *LoggingMiddleware) Aggregate(_ context.Context, dist types.Distance) error {
-	return nil
+func (mw *LoggingMiddleware) Aggregate(ctx context.Context, dist types.Distance) error {
+	return mw.next.Aggregate(ctx, dist)
 }
 
-func (mw *LoggingMiddleware) Calculate(_ context.Context, obuID int) (*types.Invoice, error) {
-	return nil, nil
+func (mw *LoggingMiddleware) Calculate(ctx context.Context, obuID int) (*types.Invoice, error) {
+	return mw.next.Calculate(ctx, obuID)
 }
 
 type InstrumentationMiddleware struct {
@@ -40,10 +40,10 @@ func newInstrumentationMiddleware() Middleware {
 	}
 }
 
-func (mw *InstrumentationMiddleware) Aggregate(_ context.Context, dist types.Distance) error {
-	return nil
+func (mw *InstrumentationMiddleware) Aggregate(ctx context.Context, dist types.Distance) error {
+	return mw.next.Aggregate(ctx, dist)
 }
 
-func (mw *InstrumentationMiddleware) Calculate(_ context.Context, obuID int) (*types.Invoice, error) {
-	return nil, nil
+func (mw *InstrumentationMiddleware) Calculate(ctx context.Context, obuID int) (*types.Invoice, error) {
+	return mw.next.Calculate(ctx, obuID)
 }
