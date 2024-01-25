@@ -44,9 +44,9 @@ func (svc *BasicService) Calculate(_ context.Context, obuID int) (*types.Invoice
 	return invoice, nil
 }
 
-// New aggregator service will construct a complete micro service
+// New will construct a complete micro service
 // with logging and instrumentation middleware
-func NewAggregateService() Service {
+func New() Service {
 	var svc Service
 	{
 		svc = newBasicService(NewMemoryStore())

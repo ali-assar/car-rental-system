@@ -2,15 +2,48 @@ package aggendpoint
 
 import (
 	"context"
+	"time"
 
-	"github.com/Ali-Assar/car-rental-system/go-kit-example/aggservice/aggservice"
+	"github.com/Ali-Assar/car-rental-system/go-kit-example/aggsvc/aggservice"
 	"github.com/Ali-Assar/car-rental-system/types"
+	"github.com/go-kit/kit/circuitbreaker"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/ratelimit"
+	"github.com/go-kit/log"
+	"github.com/sony/gobreaker"
+	"golang.org/x/time/rate"
 )
 
 type Set struct {
 	AggregateEndpoint endpoint.Endpoint
 	CalculateEndpoint endpoint.Endpoint
+}
+
+func New(svc aggservice.Service, logger log.Logger) Set {
+	var aggregateEndpoint endpoint.Endpoint
+	{
+		aggregateEndpoint = MakeAggregateEndpoint(svc)
+		// Sum is limited to 1 request per second with burst of 1 request.
+		// Note, rate is defined as a time interval between requests.
+		aggregateEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 1))(aggregateEndpoint)
+		aggregateEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(aggregateEndpoint)
+		//aggregateEndpoint = LoggingMiddleware(log.With(logger, "method", "Sum"))(aggregateEndpoint)
+		// aggregateEndpoint = InstrumentingMiddleware(duration.With("method", "Sum"))(aggregateEndpoint)
+	}
+	var calculateEndpoint endpoint.Endpoint
+	{
+		calculateEndpoint = MakeCalculateEndpoint(svc)
+		// Concat is limited to 1 request per second with burst of 100 requests.
+		// Note, rate is defined as a number of requests per second.
+		calculateEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Limit(1), 100))(calculateEndpoint)
+		calculateEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(calculateEndpoint)
+		// concatEndpoint = LoggingMiddleware(log.With(logger, "method", "Concat"))(concatEndpoint)
+		// concatEndpoint = InstrumentingMiddleware(duration.With("method", "Concat"))(concatEndpoint)
+	}
+	return Set{
+		AggregateEndpoint: aggregateEndpoint,
+		CalculateEndpoint: calculateEndpoint,
+	}
 }
 
 type AggregateRequest struct {
@@ -68,7 +101,7 @@ func MakeAggregateEndpoint(s aggservice.Service) endpoint.Endpoint {
 }
 
 // MakeConcatEndpoint constructs a Concat endpoint wrapping the service.
-func MakeConcatEndpoint(s aggservice.Service) endpoint.Endpoint {
+func MakeCalculateEndpoint(s aggservice.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(CalculateRequest)
 		inv, err := s.Calculate(ctx, req.OBUID)
