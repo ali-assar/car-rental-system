@@ -1,5 +1,5 @@
 api:
-	@go build -o bin/api
+	@go build -o bin/api ./rest-api
 	@./bin/api
 
 seed:
@@ -24,6 +24,10 @@ agg:
 	@go build -o bin/aggregator ./aggregator
 	@./bin/aggregator
 
+go-kit:
+	@go build -o bin/go-kit ./go-kit-example/aggsvc/cmd
+	@./bin/go-kit-agg
+
 test:
 	@go test -count=1 -v ./...
 
@@ -33,4 +37,4 @@ all:  calculator receiver obu
 proto:
 	protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative types/ptypes.proto
 
-.PHONY: deps build run seed obu receiver calculator agg test api gate
+.PHONY: deps build run seed obu receiver calculator agg test api gate go-kit
