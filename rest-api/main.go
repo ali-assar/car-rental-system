@@ -6,8 +6,8 @@ import (
 
 	"log"
 
-	"github.com/Ali-Assar/car-rental-system/api"
 	"github.com/Ali-Assar/car-rental-system/db"
+	"github.com/Ali-Assar/car-rental-system/rest-api/api"
 	"github.com/joho/godotenv"
 
 	"github.com/gofiber/fiber/v2"

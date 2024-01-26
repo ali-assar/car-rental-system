@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Ali-Assar/car-rental-system/api"
 	"github.com/Ali-Assar/car-rental-system/db"
 	"github.com/Ali-Assar/car-rental-system/db/fixtures"
+	"github.com/Ali-Assar/car-rental-system/rest-api/api"
 	"github.com/joho/godotenv"
 
 	"go.mongodb.org/mongo-driver/mongo"
