@@ -64,3 +64,10 @@ services:
       - GF_SECURITY_LOGIN_REMEMBER_DAYS=7
     depends_on:
       - prometheus
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    command: mongod
