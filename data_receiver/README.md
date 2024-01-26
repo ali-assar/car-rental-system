@@ -10,7 +10,7 @@ The Data Receiver microservice is designed to handle WebSocket connections, rece
 
 Start the Data Receiver microservice:
 
-bash
-Copy code
+```
 make receiver
 make obu
+```
